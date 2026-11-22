@@ -45,6 +45,9 @@
     "resolve-url-loader": "$resolve-url-loader",
     "follow-redirects": "1.16.3",
     "webpack-dev-server": "6.1.0",
-    "webpack-dev-middleware": "8.6.3"
+    "webpack-dev-middleware": "8.6.3",
+    "debug": "4.4.3",
+    "uuid": "11.1.1",
+    "cookie": "0.7.2"
   }
 }
