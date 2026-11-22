@@ -23,7 +23,7 @@ else server = require('http').createServer(app);
 let	io              = require('socket.io')(server),
 	redis 			= require('redis'),
     redisClient 	= redis.createClient({
-		path : '/var/run/redis/redis.sock'
+		socket: { path: '/var/run/redis/redis.sock' }
 	}),
 	requestify 		= require('requestify'),
 	acho 			= require('acho'),
@@ -56,29 +56,36 @@ function updateOnline(online) {
 	io.sockets.emit('online', online);
 }
 
-redisClient.subscribe('message');
-redisClient.subscribe('chat.clear');
-redisClient.subscribe('new.msg');
-redisClient.subscribe('del.msg');
-redisClient.subscribe('ban.msg');
-redisClient.subscribe('updateBalance');
-redisClient.subscribe('updateBalanceAfter');
-redisClient.subscribe('updateBonus');
-redisClient.subscribe('updateBonusAfter');
-redisClient.subscribe('wheel');
-redisClient.subscribe('jackpot.timer');
-redisClient.subscribe('jackpot.slider');
-redisClient.subscribe('jackpot');
-redisClient.subscribe('crash');
-redisClient.subscribe('new.flip');
-redisClient.subscribe('end.flip');
-redisClient.subscribe('new.bomb');
-redisClient.subscribe('end.bomb');
-redisClient.subscribe('battle.newBet');
-redisClient.subscribe('battle.startTime');
-redisClient.subscribe('dice');
-redisClient.subscribe('bonus');
-redisClient.on('message', function(channel, message) {
+const redisChannels = [
+    'message',
+    'chat.clear',
+    'new.msg',
+    'del.msg',
+    'ban.msg',
+    'updateBalance',
+    'updateBalanceAfter',
+    'updateBonus',
+    'updateBonusAfter',
+    'wheel',
+    'jackpot.timer',
+    'jackpot.slider',
+    'jackpot',
+    'crash',
+    'new.flip',
+    'end.flip',
+    'new.bomb',
+    'end.bomb',
+    'battle.newBet',
+    'battle.startTime',
+    'dice',
+    'bonus'
+];
+
+(async () => {
+    try {
+        await redisClient.connect();
+        await redisClient.subscribe(redisChannels, (message, channel) => {
+
 	if(channel == 'chat.clear') io.sockets.emit('clear', JSON.parse(message));
 	if(channel == 'new.msg') io.sockets.emit('chat', JSON.parse(message));
 	if(channel == 'del.msg') io.sockets.emit('chatdel', JSON.parse(message));
@@ -112,7 +119,9 @@ redisClient.on('message', function(channel, message) {
     }
 	if(typeof message == 'string') return io.sockets.emit(channel, JSON.parse(message));
 	io.sockets.emit(channel, message);
-});
+        });
+    } catch (err) { console.error('[REDIS]', err); }
+})();
 
 /* Jackpot */
 

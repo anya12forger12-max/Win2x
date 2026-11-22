@@ -1,10 +1,16 @@
-const {promisify} = require('util');
 const requestify = require('requestify');
 const RedisClient = require('redis').createClient({
-    path : '/var/run/redis/redis.sock'
+    socket: { path: '/var/run/redis/redis.sock' }
 });
-const getAsync = promisify(RedisClient.get).bind(RedisClient);
-const setAsync = promisify(RedisClient.set).bind(RedisClient);
+const redisReady = RedisClient.connect().catch((err) => console.error('[REDIS]', err));
+const setAsync = async (...args) => {
+    await redisReady;
+    return RedisClient.set(...args);
+};
+const publishAsync = async (...args) => {
+    await redisReady;
+    return RedisClient.publish(...args);
+};
 const config = require('./config');
 var fs = require('fs'),
 	getProtocolOptions = () => config.https ? {
@@ -137,7 +143,7 @@ exports.request = (path, body) => {
 
 exports.log = (log) => console.log('[CRASH] ' + log);
 
-exports.emit = (json) => RedisClient.publish('crash', JSON.stringify(json));
+exports.emit = (json) => publishAsync('crash', JSON.stringify(json));
 
 exports._colors = {
     one: '#a6caf0',
