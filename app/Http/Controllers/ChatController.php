@@ -166,8 +166,7 @@ class ChatController extends Controller
 	}
 
     public function add_message(Request $request) {
-		if(\Cache::has('action.user.' . $this->user->id)) return response()->json(['message' => 'You send messages too often!', 'status' => 'error']);
-        \Cache::put('action.user.' . $this->user->id, '', 5);
+		if(!\Cache::add('action.user.' . $this->user->id, '', 5)) return response()->json(['message' => 'You send messages too often!', 'status' => 'error']);
         $val = \Validator::make($request->all(), [
             'messages' => 'required|string|max:255'
         ],[

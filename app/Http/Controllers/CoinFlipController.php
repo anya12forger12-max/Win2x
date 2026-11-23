@@ -40,8 +40,7 @@ class CoinFlipController extends Controller {
 	}
 	
 	public function createRoom(Request $r) {
-		if(\Cache::has('action.user.' . $this->user->id)) return response()->json(['msg' => 'Wait before previous action!', 'type' => 'error']);
-        \Cache::put('action.user.' . $this->user->id, '', 2);
+		if(!\Cache::add('action.user.' . $this->user->id, '', 2)) return response()->json(['msg' => 'Wait before previous action!', 'type' => 'error']);
 		if($this->user->ban) return;
 		$balType = $r->get('balance');
 		
@@ -142,8 +141,7 @@ class CoinFlipController extends Controller {
     }
 	
 	public function joinGame(Request $r) {
-		if(\Cache::has('action.user.' . $this->user->id)) return response()->json(['msg' => 'Wait before previous action!', 'type' => 'error']);
-        \Cache::put('action.user.' . $this->user->id, '', 2);
+		if(!\Cache::add('action.user.' . $this->user->id, '', 2)) return response()->json(['msg' => 'Wait before previous action!', 'type' => 'error']);
 		if($this->user->ban) return;
 		$balType = $r->get('balance');
 		if($balType != 'balance' && $balType != 'bonus') return response()->json(['type' => 'error', 'msg' => 'Unable to determine your balance type!']);

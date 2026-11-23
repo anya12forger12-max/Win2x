@@ -105,8 +105,7 @@ class PagesController extends Controller
 	}
 	
 	public function freeSpin(Request $r) {
-		if(\Cache::has('action.user.' . $this->user->id)) return response()->json(['msg' => 'Wait before previous action!', 'type' => 'error']);
-        \Cache::put('action.user.' . $this->user->id, '', 2);
+		if(!\Cache::add('action.user.' . $this->user->id, '', 2)) return response()->json(['msg' => 'Wait before previous action!', 'type' => 'error']);
 		$validator = \Validator::make($r->all(), [
             'recapcha' => 'required|captcha',
         ]);
@@ -229,8 +228,7 @@ class PagesController extends Controller
 	}
 	
 	public function promoActivate(Request $r) {
-		if(\Cache::has('action.user.' . $this->user->id)) return response()->json(['success' => false, 'msg' => 'Wait before previous action!', 'type' => 'error']);
-        \Cache::put('action.user.' . $this->user->id, '', 5);
+		if(!\Cache::add('action.user.' . $this->user->id, '', 5)) return response()->json(['success' => false, 'msg' => 'Wait before previous action!', 'type' => 'error']);
 		
 		$code = strtolower(htmlspecialchars($r->get('code')));
         if(!$code) return response()->json(['success' => false, 'msg' => 'You don`t entered a code!', 'type' => 'error']);
@@ -290,8 +288,7 @@ class PagesController extends Controller
 	}
 	
 	public function affiliateGet() {
-		if(\Cache::has('action.user.' . $this->user->id)) return response()->json(['msg' => 'Wait before previous action!', 'type' => 'error']);
-        \Cache::put('action.user.' . $this->user->id, '', 5);
+		if(!\Cache::add('action.user.' . $this->user->id, '', 5)) return response()->json(['msg' => 'Wait before previous action!', 'type' => 'error']);
 		if($this->user->ref_money < $this->settings->min_ref_withdraw) return response()->json(['success' => false, 'msg' => 'Minimum getting amount '. $this->settings->min_ref_withdraw .'$!', 'type' => 'error']);
 		
 		DB::beginTransaction();
@@ -316,8 +313,7 @@ class PagesController extends Controller
 	}
 	
 	public function exchange(Request $r) {
-		if(\Cache::has('action.user.' . $this->user->id)) return response()->json(['msg' => 'Wait before previous action!', 'type' => 'error']);
-        \Cache::put('action.user.' . $this->user->id, '', 5);
+		if(!\Cache::add('action.user.' . $this->user->id, '', 5)) return response()->json(['msg' => 'Wait before previous action!', 'type' => 'error']);
 		$sum = floatval($r->get('sum'));
 		
 		if($sum < $this->settings->exchange_min) return ['msg' => 'Minimum exchange amount '.$this->settings->exchange_min.'$!', 'type' => 'error'];
@@ -422,8 +418,7 @@ class PagesController extends Controller
 	}
 	
 	public function unbanMe() {
-		if(\Cache::has('action.user.' . $this->user->id)) return response()->json(['msg' => 'Wait before previous action!', 'type' => 'error']);
-        \Cache::put('action.user.' . $this->user->id, '', 2);
+		if(!\Cache::add('action.user.' . $this->user->id, '', 2)) return response()->json(['msg' => 'Wait before previous action!', 'type' => 'error']);
 		if(!$this->user->banchat) return [
 			'success' => false,
 			'type' => 'error',
@@ -435,7 +430,7 @@ class PagesController extends Controller
 			'msg' => 'You do not have enough money to unlock!'
 		];
 		
-		$this->user->balance -= 50;
+		$this->user->balance -= 0.50;
 		$this->user->banchat = null;
 		$this->user->save();
 		
@@ -588,8 +583,7 @@ class PagesController extends Controller
 	}
 	
 	public function pay(Request $r) {
-		if(\Cache::has('action.user.' . $this->user->id)) return response()->json(['msg' => 'Wait before previous action!', 'type' => 'error']);
-        \Cache::put('action.user.' . $this->user->id, '', 5);
+		if(!\Cache::add('action.user.' . $this->user->id, '', 5)) return response()->json(['msg' => 'Wait before previous action!', 'type' => 'error']);
 		
 		if($r->get('amount') < $this->settings->min_dep) return response()->json(['success' => false, 'msg' => 'Minimum deposit amount '.$this->settings->min_dep.'$!', 'type' => 'error']);
 		if(!$r->get('type')) return response()->json(['success' => false, 'msg' => 'You have not chosen a payment system!', 'type' => 'error']);
@@ -602,7 +596,7 @@ class PagesController extends Controller
 			$depo['user_id'] = $this->user->id;
 			$depo['amount'] = $amount;
 			$depo['usd_amo'] = round($usdamo, 2);
-			$depo['trx'] = str_random(16);
+			$depo['trx'] = \Illuminate\Support\Str::random(16);
 			$depo['try'] = 0;
 			$depo['status'] = 0;
 
@@ -630,7 +624,7 @@ class PagesController extends Controller
 			$depo['user_id'] = $this->user->id;
 			$depo['amount'] = $amount;
 			$depo['usd_amo'] = round($usdamo, 2);
-			$depo['trx'] = str_random(16);
+			$depo['trx'] = \Illuminate\Support\Str::random(16);
 			$depo['try'] = 0;
 			$depo['status'] = 0;
 
@@ -773,8 +767,7 @@ class PagesController extends Controller
     }
 	
 	public function userWithdraw(Request $r) {
-		if(\Cache::has('action.user.' . $this->user->id)) return response()->json(['msg' => 'Wait before previous action!', 'type' => 'error']);
-        \Cache::put('action.user.' . $this->user->id, '', 5);
+		if(!\Cache::add('action.user.' . $this->user->id, '', 5)) return response()->json(['msg' => 'Wait before previous action!', 'type' => 'error']);
 		
 		if($this->settings->min_dep_withdraw) {
 			$dep = Deposit::where('user_id', $this->user->id)->where('status', 1)->sum('amount');
@@ -836,10 +829,10 @@ class PagesController extends Controller
 	}
 	
 	public function userWithdrawCancel(Request $r) {
-		if(\Cache::has('action.user.' . $this->user->id)) return response()->json(['success' => false, 'msg' => 'Wait before previous action!', 'type' => 'error']);
-        \Cache::put('action.user.' . $this->user->id, '', 2);
+		if(!\Cache::add('action.user.' . $this->user->id, '', 2)) return response()->json(['success' => false, 'msg' => 'Wait before previous action!', 'type' => 'error']);
 		$id = $r->get('id');
         $withdraw = Withdraw::where('id', $id)->first();
+		if(is_null($withdraw)) return response()->json(['success' => false, 'msg' => 'Withdrawal not found!', 'type' => 'error']);
 		
 		if($withdraw->status > 0) return response()->json(['success' => false, 'msg' => 'You cannot cancel this withdraw!', 'type' => 'error']);
 		if($withdraw->user_id != $this->user->id) return response()->json(['success' => false, 'msg' => 'You cannot cancel another user`s withdraw!', 'type' => 'error']);
