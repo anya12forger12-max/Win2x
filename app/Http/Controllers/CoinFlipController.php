@@ -166,6 +166,19 @@ class CoinFlipController extends Controller {
 				DB::rollback();
 				return response()->json(['type' => 'error', 'msg' => 'Game #'.$room->id.' already begin!']);
 			}
+
+			// Claim the free slot atomically. Two different players can pass the
+			// stale $room->status check above at the same time; without this both
+			// get debited and both settle a winner for the same room.
+			$claimed = DB::table('flip')
+                    ->where('id', $room->id)
+                    ->where('status', 0)
+                    ->where(function($query) { $query->whereNull('tails')->orWhere('tails', 0); })
+                    ->update(['tails' => $this->user->id, 'status' => 1]);
+            if(!$claimed) {
+                DB::rollback();
+                return response()->json(['type' => 'error', 'msg' => 'Game #'.$room->id.' already begin!']);
+            }
 			if(!$coins) {
 				DB::rollback();
 				return response()->json(['type' => 'error', 'msg' => 'You have not entered a bid amount!']);
