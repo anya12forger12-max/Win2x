@@ -164,4 +164,6 @@ exports.getColors = function(n)
     return this._colors.one;
 }
 
-this.init();
+// Do not auto-start here: app.js requires this module and calls crash.init()
+// explicitly. Leaving this call would spawn a second timer/animation loop that
+// races the first one over the Redis 'cashout'/'float' keys used for payouts.
