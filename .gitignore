@@ -21,3 +21,7 @@ phpmyadmin/
 
 # Deployment env files must stay untracked; use .env.example as the template
 env
+
+# Never commit credentials
+.gh_token
+.token
