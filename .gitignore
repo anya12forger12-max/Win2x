@@ -13,3 +13,7 @@ yarn-error.log
 # TLS material must be mounted at deploy time, never committed
 *.pem
 *.key
+
+# Database admin consoles must never sit in the public web root
+adminer*.php
+phpmyadmin/

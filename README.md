@@ -198,18 +198,18 @@ show databases;
 
 CREATE DATABASE betbase; /// создание базы, имя базы "baza"
 
-GRANT ALL PRIVILEGES ON baza.* TO user@localhost IDENTIFIED BY '3X1i8T6bO0b4K6s9'; /// имя базы "baza", создание пользователя базы "user", пароль "3X1i8T6bO0b4K6s9"
+GRANT ALL PRIVILEGES ON baza.* TO user@localhost IDENTIFIED BY '<generate-a-strong-password>'; /// имя базы "baza", создание пользователя базы "user", пароль из защищённого хранилища
 
 exit
 
-/// Заходим в phpmyadmin "http://betbase.gg/phpmyadmin/" или adminer и заливаем бд.
+/// Для залива БД используйте административный доступ к БД вне публичного web root. Публичный adminer.php удалён.
 
 =========================СОЗДАЕМ ВСЕ ДЛЯ ЗАЛИВАНИЯ БАЗЫ И ЗАЛИВАЕМ ЕЕ END=========================
 
 /// После прописываем данные от базы в ".env" находится он в "/var/www/betbase.gg/.env"
 /// Теперь выдаем права на папку:
 
-chmod -Rf 777 /var/www/betbase.gg/storage
+chown -R www-data:www-data /var/www/betbase.gg/storage && chmod -R u=rwX,g=rX,o= /var/www/betbase.gg/storage
 
 -------------------------------------------------
 
