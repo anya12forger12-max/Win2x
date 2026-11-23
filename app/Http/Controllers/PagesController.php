@@ -146,7 +146,7 @@ class PagesController extends Controller
 					'start' => $b->start
 				];
 			}
-			$win = $list[array_rand($list)];
+			$win = $list[$this->secureArrayKey($list)];
 
 			$remaining = Carbon::now()->addMinutes($this->settings->bonus_group_time)->getTimestamp();
 
@@ -198,7 +198,7 @@ class PagesController extends Controller
 					'start' => $b->start
 				];
 			}
-			$win = $list[array_rand($list)];
+			$win = $list[$this->secureArrayKey($list)];
 
 			$remaining = 0;
 			
