@@ -751,19 +751,22 @@ class PagesController extends Controller
 	}
 
 	public function userDataUpdate($data) { 
-        if($data->status == 0) {
-            $data->status = 1;
-            $data->update();
-    
-            $user = User::where('id', $data->user_id)->first();
-            $user->balance += $data->amount;
-            $user->update();
+        // Two IPNs can load the same status=0 deposit before either commits.
+        // Only the update that actually claims the row may credit the balance;
+        // a stale model's status check is not enough to prevent a double payout.
+        $claimed = Deposit::where('id', $data->id)->where('status', 0)->update(['status' => 1]);
+        if(!$claimed) return;
+        
+        $user = User::where('id', $data->user_id)->first();
+        if(is_null($user)) return;
+        
+        DB::table('users')->where('id', $user->id)->increment('balance', $data->amount);
+        $balance = DB::table('users')->where('id', $user->id)->value('balance');
 			
 			$this->redis->publish('updateBalance', json_encode([
 				'unique_id'    => $user->unique_id,
-				'balance' => round($user->balance, 2)
+				'balance' => round((float)$balance, 2)
 			]));
-        }
     }
 	
 	public function userWithdraw(Request $r) {
