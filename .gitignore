@@ -17,3 +17,6 @@ yarn-error.log
 # Database admin consoles must never sit in the public web root
 adminer*.php
 phpmyadmin/
+
+# Deployment env files must stay untracked; use .env.example as the template
+env
