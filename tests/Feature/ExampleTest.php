@@ -2,20 +2,24 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Support\Facades\Route;
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class ExampleTest extends TestCase
 {
     /**
-     * A basic test example.
+     * The home route must stay registered without booting the controller.
      *
-     * @return void
+     * JackpotController's constructor talks to MySQL, Redis and a remote
+     * ticker, so dispatching the request here would make a unit-level smoke
+     * test depend on production infrastructure.
      */
-    public function testBasicTest()
+    public function testHomeRouteIsRegistered(): void
     {
-        $response = $this->get('/');
+        $route = Route::getRoutes()->getByName('index');
 
-        $response->assertStatus(200);
+        $this->assertNotNull($route, 'The named home route is missing.');
+        $this->assertSame('/', $route->uri());
+        $this->assertStringEndsWith('JackpotController@index', $route->getActionName());
     }
 }

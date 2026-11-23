@@ -2,18 +2,16 @@
 
 namespace Tests\Unit;
 
+use Illuminate\Foundation\Application;
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class ExampleTest extends TestCase
 {
     /**
      * A basic test example.
-     *
-     * @return void
      */
-    public function testBasicTest()
+    public function testApplicationBoots(): void
     {
-        $this->assertTrue(true);
+        $this->assertInstanceOf(Application::class, $this->app);
     }
 }

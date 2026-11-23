@@ -1,5 +1,14 @@
 Crypto Casino with Slots, Aviator, Crash , Dice , Flip, Jackpot, wheel, Pvp and more features.
 
+## Testing
+
+```bash
+composer install
+composer test
+```
+
+The smoke tests boot the Laravel application and verify route registration only. They do not need MySQL, Redis, or outbound network access.
+
 Installation 
 
 ![image](https://user-images.githubusercontent.com/94198465/208200275-9d6fd2c6-0ffd-4e9d-8856-710d788830d0.png)
