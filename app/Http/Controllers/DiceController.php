@@ -65,7 +65,7 @@ class DiceController extends Controller {
 		try {
 			$chance = round($perc, 2);
 			$vip = round(96/$chance, 2);
-			$rand = rand(0, 10000);
+			$rand = $this->secureInt(0, 10000);
 			$generate = $rand / 100;
 
 			if($sum == round($sum*$vip, 2)) {
@@ -77,7 +77,7 @@ class DiceController extends Controller {
 				while($perc >= $generate) {
 					$chance = round($perc, 2);
 					$vip = round(96/$chance,2);
-					$rand = rand(0, 10000);
+					$rand = $this->secureInt(0, 10000);
 					$generate = $rand / 100;
 				}
 			}
@@ -273,7 +273,7 @@ class DiceController extends Controller {
 			}
 			$chance = round($perc, 2);
 			$vip = round(96/$chance, 2);
-			$rand = rand(0, 10000);
+			$rand = $this->secureInt(0, 10000);
 			$generate = $rand / 100;
 
 			if($sum == round($sum*$vip, 2)) {
@@ -380,7 +380,7 @@ class DiceController extends Controller {
 			}
 			$chance = round($perc, 2);
 			$vip = round(96/$chance, 2);
-			$rand = rand(0, 10000);
+			$rand = $this->secureInt(0, 10000);
 			$generate = $rand / 100;
 
 			if($sum == round($sum*$vip, 2)) {
