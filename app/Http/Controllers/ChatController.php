@@ -100,13 +100,13 @@ class ChatController extends Controller
 			$admin = 1;
 		}
 		
-		$returnValue = ['unique_id' => $unique_id, 'avatar' => $avatar, 'time2' => Carbon::now()->getTimestamp(), 'time' => $time, 'messages' => '<span style="color: #4986f5;">User "'.$user->username.'" blocked in chat on '.floatval($r->get('time')).' mins.'. ($r->get('reason') ? ' Reason: '.htmlspecialchars($r->get('reason')).'.' : '') .'</span>', 'username' => $username, 'ban' => $ban, 'admin' => $admin, 'moder' => $moder, 'youtuber' => $youtuber];
+		$returnValue = ['unique_id' => $unique_id, 'avatar' => $avatar, 'time2' => Carbon::now()->getTimestamp(), 'time' => $time, 'messages' => '<span style="color: #4986f5;">User "'.htmlspecialchars($user->username).'" blocked in chat on '.floatval($r->get('time')).' mins.'. ($r->get('reason') ? ' Reason: '.htmlspecialchars($r->get('reason')).'.' : '') .'</span>', 'username' => $username, 'ban' => $ban, 'admin' => $admin, 'moder' => $moder, 'youtuber' => $youtuber];
 		$returnBan = ['unique_id' => $user->unique_id, 'username' => $banusername, 'ban' => 1];
 		$this->redis->publish(self::BAN_CHANNEL, json_encode($returnBan));
 		$this->redis->rpush(self::CHAT_CHANNEL, json_encode($returnValue));
 		$this->redis->publish(self::NEW_MSG_CHANNEL, json_encode($returnValue));
 		
-		return response()->json(['success' => true, 'msg' => 'User '. $user->username .' blocked in chat on '. $r->get('time') .' mins!', 'type' => 'success']);
+		return response()->json(['success' => true, 'msg' => 'User '. htmlspecialchars($user->username) .' blocked in chat on '. $r->get('time') .' mins!', 'type' => 'success']);
 	}
 	
 	public function unban(Request $r) {
@@ -136,13 +136,13 @@ class ChatController extends Controller
 			$admin = 1;
 		}
 		
-		$returnValue = ['unique_id' => $unique_id, 'avatar' => $avatar, 'time2' => Carbon::now()->getTimestamp(), 'time' => $time, 'messages' => '<span style="color: #4986f5;">User "'.$user->username.'" unlocked in chat.</span>', 'username' => $username, 'ban' => $ban, 'admin' => $admin, 'moder' => $moder, 'youtuber' => $youtuber];
+		$returnValue = ['unique_id' => $unique_id, 'avatar' => $avatar, 'time2' => Carbon::now()->getTimestamp(), 'time' => $time, 'messages' => '<span style="color: #4986f5;">User "'.htmlspecialchars($user->username).'" unlocked in chat.</span>', 'username' => $username, 'ban' => $ban, 'admin' => $admin, 'moder' => $moder, 'youtuber' => $youtuber];
 		$returnBan = ['unique_id' => $user->unique_id, 'username' => $banusername, 'ban' => 0];
 		$this->redis->publish(self::BAN_CHANNEL, json_encode($returnBan));
 		$this->redis->rpush(self::CHAT_CHANNEL, json_encode($returnValue));
 		$this->redis->publish(self::NEW_MSG_CHANNEL, json_encode($returnValue));
 		
-		return response()->json(['success' => true, 'msg' => 'User '. $user->username .' unlocked in chat!', 'type' => 'success']);
+		return response()->json(['success' => true, 'msg' => 'User '. htmlspecialchars($user->username) .' unlocked in chat!', 'type' => 'success']);
 	}
 	
 	public function clear() {
