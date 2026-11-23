@@ -270,7 +270,7 @@ class JackpotController extends Controller {
 				'user_id' => $user->id,
 				'sum' => floatval($r->get('amount')),
 				'color' => ($bet) ? $bet->color : $this->getRandomColor(),
-				'balance' => $r->get('balance')
+				'balance' => $balance
 			]);
 
 			DB::commit();
@@ -401,7 +401,7 @@ class JackpotController extends Controller {
 				'user_id' => $user->id,
 				'sum' => floatval($r->get('amount')),
 				'color' => ($bet) ? $bet->color : $this->getRandomColor(),
-				'balance' => $r->get('balance'),
+				'balance' => $balance,
 				'fake' => 1
 			]);
 
