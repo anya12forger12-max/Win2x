@@ -347,6 +347,15 @@ class CrashController extends Controller {
             }
 
             $float = floatval($this->redis->get('float'));
+
+            // The bot publishes the live multiplier to Redis. Between rounds that
+            // key can still hold the PREVIOUS round's crash point, and enabling
+            // cashouts before the bot resets it allowed a player to be paid at
+            // that stale (often much larger) multiplier. The game row is the
+            // authoritative crash point for this round: never pay above it.
+            $maxFloat = floatval($this->game->multiplier);
+            if($maxFloat > 0 && $float > $maxFloat) $float = $maxFloat;
+
             if($bet->withdraw > 0 && $bet->withdraw < $float && $bet->withdraw < $this->game->multiplier) $float = $bet->withdraw;
             if($float <= 0 && $bet->withdraw < $float && $bet->withdraw < $this->game->multiplier) $float = $bet->withdraw;
             if($float <= 0) {

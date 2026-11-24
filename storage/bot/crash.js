@@ -68,6 +68,12 @@ exports.startSlider = async() => {
     
     if(typeof this.animateInterval != 'undefined') clearInterval(this.animateInterval);
 
+    // Reset the payout state BEFORE accepting cashouts. The 'float' key holds the
+    // previous round's crash value until the first animation tick; leaving it
+    // while 'cashout' is enabled gives a short window where a cashout is paid at
+    // that stale multiplier.
+    await setAsync('cashout', 0);
+    await setAsync('float', '1.00');
     await setAsync('cashout', 1); // accept cashout
 
     this.float = parseFloat(res.multiplier); // float
