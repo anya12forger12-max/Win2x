@@ -226,7 +226,7 @@
                             <div class="side-nav-tooltip">Crash</div>
                         </a>
                     </li>
-                    <li class="{{ Request::is('/') ? 'current' : '' || Request::is('jackpot/history') ? 'current' : ''  || Request::is('jackpot/history/*') ? 'current' : '' }}">
+                    <li class="{{ Request::is('/') || Request::is('jackpot/history') || Request::is('jackpot/history/*') ? 'current' : '' }}">
                         <a class="" href="/">
                             <svg class="icon">
                                 <use xlink:href="/img/symbols.svg#icon-jackpot"></use>
@@ -234,7 +234,7 @@
                             <div class="side-nav-tooltip">Jackpot</div>
                         </a>
                     </li>
-                    <li class="{{ Request::is('wheel') ? 'current' : '' || Request::is('wheel/history') ? 'current' : '' }}">
+                    <li class="{{ Request::is('wheel') || Request::is('wheel/history') ? 'current' : '' }}">
                         <a class="" href="/wheel">
                             <svg class="icon">
                                 <use xlink:href="/img/symbols.svg#icon-roulette"></use>
