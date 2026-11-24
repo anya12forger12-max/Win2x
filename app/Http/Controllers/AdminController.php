@@ -642,6 +642,7 @@ class AdminController extends Controller {
         }
         
 		$user = User::where('user_id', $r->get('user_id'))->first();
+		if(is_null($user)) return response()->json(['message' => 'The user is not found!', 'status' => 'error']);
 		
         $messages = $r->get('message');
         if(\Cache::has('addmsg.user.' . $user->id)) return response()->json(['message' => 'You send messages too often!', 'status' => 'error']);

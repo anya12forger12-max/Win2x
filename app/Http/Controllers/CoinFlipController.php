@@ -149,6 +149,10 @@ class CoinFlipController extends Controller {
 		DB::beginTransaction();
 		try {
 			$room = CoinFlip::where('id', $r->get('id'))->first();
+			if(!$room) {
+				DB::rollBack();
+				return response()->json(['type' => 'error', 'msg' => 'Room not found!']);
+			}
 			$coins = $room->bank;
 			if($balType == 'balance' && $coins > $this->user->balance) {
 				DB::rollback();
