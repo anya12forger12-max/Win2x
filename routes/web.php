@@ -18,7 +18,7 @@ Route::post('/jackpot/initHistory', 'JackpotController@initHistory');
 Route::get('/wheel', ['as' => 'wheel', 'uses' => 'WheelController@index']);
 Route::get('/bets/{id}', 'JackpotController@parseJackpotGame');
 Route::get('/crash', ['as' => 'crash', 'uses' => 'CrashController@index']);
-Route::get('/getFloat', ['as' => 'crash', 'uses' => 'CrashController@getFloat']);
+Route::get('/getFloat', ['as' => 'crash.getFloat', 'uses' => 'CrashController@getFloat']);
 Route::get('/coinflip', ['as' => 'coinflip', 'uses' => 'CoinFlipController@index']);
 Route::get('/battle', ['as' => 'battle', 'uses' => 'BattleController@index']);
 Route::get('/dice', ['as' => 'dice', 'uses' => 'DiceController@index']);
@@ -46,7 +46,7 @@ Route::group(['middleware' => 'auth'], function () {
 	Route::post('/free/getWheel', 'PagesController@freeGetWheel');
 	Route::post('/free/spin', 'PagesController@freeSpin');
 	Route::post('/promo/activate', 'PagesController@promoActivate');
-    Route::get('/logout', ['as' => 'logout', 'uses' => 'AuthController@logout']);
+    Route::get('/logout', ['as' => 'logout.get', 'uses' => 'AuthController@logout']);
 	Route::post('/chat', 'ChatController@add_message');
 	Route::post('/unbanMe', 'PagesController@unbanMe');
 	Route::post('/exchange', 'PagesController@exchange');

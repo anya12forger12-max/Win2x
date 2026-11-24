@@ -41,9 +41,9 @@ class AdminController extends Controller {
 		$jackpot_easy = Jackpot::where('room', 'easy')->orderBy('id', 'desc')->first();
 		$jackpot_medium = Jackpot::where('room', 'medium')->orderBy('id', 'desc')->first();
 		$jackpot_hard = Jackpot::where('room', 'hard')->orderBy('id', 'desc')->first();
-        view()->share('chances_easy', $this->getChancesOfGame($jackpot_easy->id));
-        view()->share('chances_medium', $this->getChancesOfGame($jackpot_medium->id));
-        view()->share('chances_hard', $this->getChancesOfGame($jackpot_hard->id));
+        view()->share('chances_easy', $jackpot_easy ? $this->getChancesOfGame($jackpot_easy->id) : []);
+        view()->share('chances_medium', $jackpot_medium ? $this->getChancesOfGame($jackpot_medium->id) : []);
+        view()->share('chances_hard', $jackpot_hard ? $this->getChancesOfGame($jackpot_hard->id) : []);
     }
 	
 	public function index() {
@@ -669,7 +669,7 @@ class AdminController extends Controller {
 	public static function getChancesOfGame($gameid) {
 		$game = Jackpot::where('id', $gameid)->first();
         $users = [];
-        if(!$game) return;
+        if(!$game) return [];
         $bets = JackpotBets::where('game_id', $game->id)->orderBy('id', 'desc')->get();
         foreach($bets as $bet) {
             $find = 0;
@@ -679,10 +679,12 @@ class AdminController extends Controller {
         
         // get chances
         $chances = [];
-        foreach($users as $user) {
-            $user   = User::where('id', $user)->first();
+        $price   = JackpotBets::where('game_id', $game->id)->sum('sum');
+        if($price <= 0) return [];
+        foreach($users as $userId) {
+            $user   = User::where('id', $userId)->first();
+            if(!$user) continue; // bet placed by a user that no longer exists
             $value  = JackpotBets::where('game_id', $game->id)->where('user_id', $user->id)->sum('sum');
-            $price  = JackpotBets::where('game_id', $game->id)->sum('sum');
             $chance = round(($value/$price)*100);
 			
             $chances[] = [
