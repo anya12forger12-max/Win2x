@@ -45,6 +45,9 @@ class DiceController extends Controller {
 	}
 	
 	public function play(Request $r) {
+		// Dice debits and credits the same user row from a stale model. Without
+		// this lock, concurrent bets overwrite each other's balance updates.
+		if(!\Cache::add('action.user.' . $this->user->id, '', 2)) return response()->json(['type' => 'error', 'msg' => 'Wait before previous action!']);
 		if($this->user->ban) return;
 		$profit = Profit::calc();
 		$perc = preg_replace('/[^0-9.]/', '', $r->perc);
