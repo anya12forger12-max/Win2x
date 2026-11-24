@@ -371,7 +371,9 @@ class BattleController extends Controller {
 		$color = 'blue';
 		$comission = 0;
 		if($game->winner_team == 'red') $color = 'red'; 
-		$bets = BattleBets::where('game_id', $game->id)->where('color', $color)->get();
+		// Only pay bets that have not already been settled. A bot restart or
+		// a retry after a partial failure must never credit the same bet twice.
+		$bets = BattleBets::where('game_id', $game->id)->where('color', $color)->where('win', 0)->get();
 		
 		foreach($bets as $bet) {
 			$user = User::where(['id' => $bet->user_id, 'fake' => 0])->first();

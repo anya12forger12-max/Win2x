@@ -477,7 +477,11 @@ class WheelController extends Controller {
 	}
 	
 	private function sendMoney($game_id, $color) {
-		$bets = WheelBets::select(DB::raw('SUM(price) as price'), 'user_id', 'balance')->where('game_id', $game_id)->where('color', $color)->groupBy('user_id', 'balance')->get();
+		// Skip bets already paid by a previous settlement attempt so a retry
+		// after a crash cannot credit the same winners a second time.
+		$bets = WheelBets::select(DB::raw('SUM(price) as price'), 'user_id', 'balance')
+			->where('game_id', $game_id)->where('color', $color)->where('win', 0)
+			->groupBy('user_id', 'balance')->get();
 		$multiplier = ($color == 'black') ? 2 : (($color == 'red') ? 3 : (($color == 'green') ? 5 : 50));
 		$profit = WheelBets::where(['game_id' => $game_id, 'balance' => 'balance', 'fake' => 0])->sum('price');
         foreach($bets as $b) {
