@@ -250,3 +250,14 @@ pm2 start app.js
 SECURITY: The bundled data.sql no longer seeds an administrator account. The
 upstream dump contained a known bcrypt admin hash. Register the first account,
 then promote it by setting is_admin = 1 on its users row in the database.
+
+## Quick start — 1 or 2 commands
+
+```bash
+./setup.sh          # install dependencies
+./setup.sh run      # start the project (when a run target exists)
+```
+
+`setup.sh` detects this repository's build system and installs the right toolchain
+dependencies. Use `./setup.sh test` to run the available checks. If a project has no
+standard run target, the script prints the correct command from the sections above.
