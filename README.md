@@ -1,255 +1,36 @@
-Crypto Casino with Slots, Aviator, Crash , Dice , Flip, Jackpot, wheel, Pvp and more features.
+# Win2x — Laravel gaming platform snapshot
 
-## Testing
+A Laravel application implementing a suite of casino-style mini-games — jackpot, wheel, crash, coin flip, battle, dice, and bomb — together with user accounts, social login, chat, promotions, an affiliate area, and an admin console.
 
-```bash
-composer install
-composer test
-```
+> **Scope and legal note:** The codebase contains deposit and withdrawal routes and admin payout controls. This snapshot is for code study only. Do **not** deploy it for real money without the required licensing, KYC/AML controls, security review, and regulatory approval. No production deployment is implied or endorsed.
 
-The smoke tests boot the Laravel application and verify route registration only. They do not need MySQL, Redis, or outbound network access.
+## Stack
 
-Installation 
+- PHP `^8.3`, Laravel `^13.43`, Composer
+- MySQL for persistence; Redis via `predis/predis` for cache/session/broadcasting
+- Laravel Socialite with Facebook, Google, and VK providers
+- `yajra/laravel-datatables-oracle` for admin tables, `anhskohbo/no-captcha` for verification
+- PHPUnit and Mockery for tests
 
-![image](https://user-images.githubusercontent.com/94198465/208200275-9d6fd2c6-0ffd-4e9d-8856-710d788830d0.png)
+## Games and routes
 
-заменить betbase.gg на свой домен
--------------------------------------------------
+`routes/web.php` is the best map of the app. Public game pages include:
 
-apt-get update
+| Page | Route | Controller |
+| --- | --- | --- |
+| Jackpot | `/` | `JackpotController@index` |
+| Wheel | `/wheel` | `WheelController@index` |
+| Crash | `/crash` | `CrashController@index` |
+| Coin flip | `/coinflip` | `CoinFlipController@index` |
+| Battle | `/battle` | `BattleController@index` |
+| Dice | `/dice` | `DiceController@index` |
+| Bomb | `/bomb` | `BombController@index` |
 
-apt-get upgrade -y
+Authenticated users get betting endpoints (`/jackpot/newBet`, `/crash/newBet`, `/crash/cashout`, `/dice/play`, `/wheel/newBet`, `/battle/newBet`, and the bomb/coin-flip room flows), profile history, affiliate tools, promo activation, chat, exchange, deposit (`/pay`), and withdrawal (`/withdraw`).
 
-sudo apt --fix-broken install python-pycurl python-apt
+An `/admin` group guarded by `auth` and an `access:admin` middleware covers users, settings, bonuses, promos, filters, withdrawals, fake-user controls, and chat moderation.
 
-sudo apt-get install software-properties-common
-
-sudo apt install nginx
-
-sudo add-apt-repository ppa:ondrej/php
-
-apt-get update
-
-apt install -y nano mc curl build-essential php7.2 php7.2-fpm git php7.2-mysql php7.2-xml php7.2-mbstring mysql-server php7.2-mysql php7.2-curl redis-server
-
-echo "cgi.fix_pathinfo=0" » /etc/php/7.2/fpm/php.ini
-
-service php7.2-fpm restart
-
--------------------------------------------------
-
-/// Устанавливаем пароль root для mysql
-
-sudo service mysql stop
-
-sudo mkdir -p /var/run/mysqld
-
-sudo chown mysql:mysql /var/run/mysqld
-
-sudo /usr/sbin/mysqld --skip-grant-tables --skip-networking &
-
-mysql -u root
-
-FLUSH PRIVILEGES;
-
-USE mysql;
-
-ALTER USER 'root'@'localhost' IDENTIFIED BY 'blancos';
-
-
-UPDATE user SET plugin="mysql_native_password" WHERE User='root';
-
-quit
-
-/// Мы установили пароль "11" для пользователя "root".
-
--------------------------------------------------
-
-<!--Создание папки-->
-
-mkdir -p /var/www/betbase.gg
-
--------------------------------------------------
-
-<!--Установка композера-->
-
-curl -sS https://getcomposer.org/installer | php
-
-mv composer.phar /usr/local/bin/composer
-
-apt -y install
-
--------------------------------------------------
-
-<!--Настройка нгиникса-->
-
-
-nano /etc/nginx/sites-available/betbase.gg
-
-/// Копируем это и вставляем туда (правая кнопка мыши):
-
-server {
-listen 80;
-server_name betbase.gg www.betbase.gg;
-access_log /var/log/access.log;
-error_log /var/log/error.log;
-rewrite_log on;
-root /var/www/betbase.gg/public;
-index index.php;
-location / {
-
-try_files $uri $uri/ /index.php?$query_string;
-
-}
-if (!-d $request_filename) {
-rewrite ^/(.+)/$ /$1 permanent;
-}
-location ~* \.php$ {
-fastcgi_pass unix:/var/run/php/php7.2-fpm.sock;
-fastcgi_index index.php;
-fastcgi_split_path_info ^(.+\.php)(.*)$;
-include /etc/nginx/fastcgi_params;
-fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-}
-location ~ /\.ht {
-deny all;
-}
-location ~* \.(?:ico|css|js|jpe?g|JPG|png|svg|woff)$ {
-expires 365d;
-}
-}
-
-/// После того когда вставили этот код, нужно прожать ctrl + x, потом нажать Y а потом Enter
-
--------------------------------------------------
-
-<!--Создаем нужные папки и удаляем ненужные-->
-
-
-sudo ln -s /etc/nginx/sites-available/betbase.gg /etc/nginx/sites-enabled/
-
-
-mkdir -p /var/www/betbase.gg
-
-rm /etc/nginx/sites-available/default
-
--------------------------------------------------
-
-<!--Устанавливаем права-->
-
-chown -R www-data:www-data /var/www/betbase.gg
-
-В /etc/nginx/nginx.conf строка 62 изменить include /etc/nginx/sites-enabled/*; на include /etc/nginx/sites-available/*;
-
--------------------------------------------------
-
-<!--Перезагружаем нгиникс чтобы наши настройки сохранились-->
-
-sudo killall apache2
-
-service nginx restart
-
--------------------------------------------------
-
-<!--Установка ноде и пм2 для дальнейшего запуска бота-->
-
-sudo apt install nodejs
-
-sudo apt install npm
-
-sudo apt install build-essential
-
-nodejs -v
-
-npm -v
-
-npm install forever -g
-
-npm install forever-monitor
-
--------------------------------------------------
-
-/// Первая часть закончена, теперь заливаем архив на сервер через ftp в /var/www/betbase.gg
-
-cd /var/www/betbase.gg
-
-unzip betbase.zip /// "betbase" название архива
-
-/// Потом удаляем архив
-
--------------------------------------------------
-
-/// Устанавливаем phpmyadmin
-
-cd 
-
-sudo apt install php-mbstring
-
-sudo apt install phpmyadmin
-
-sudo sed -i "s/|\s*\((count(\$analyzed_sql_results\['select_expr'\]\)/| (\1)/g" /usr/share/phpmyadmin/libraries/sql.lib.php
-
--------------------------------------------------
-
-/// Создаем ссылку чтобы заработал phpmyadmin
-
-ln -s /usr/share/phpmyadmin /var/www/betbase.gg/public
-
-/// Ссылка для управления phpmyadmin "http://luckmaze.top/phpmyadmin/"
-
-=========================СОЗДАЕМ ВСЕ ДЛЯ ЗАЛИВАНИЯ БАЗЫ И ЗАЛИВАЕМ ЕЕ=========================
-
-/// Заходим в MySQL "Пароль создавали выше"
-
-mysql -u root -p
-
-show databases;
-
-CREATE DATABASE betbase; /// создание базы, имя базы "baza"
-
-GRANT ALL PRIVILEGES ON baza.* TO user@localhost IDENTIFIED BY '<generate-a-strong-password>'; /// имя базы "baza", создание пользователя базы "user", пароль из защищённого хранилища
-
-exit
-
-/// Для залива БД используйте административный доступ к БД вне публичного web root. Публичный adminer.php удалён.
-
-=========================СОЗДАЕМ ВСЕ ДЛЯ ЗАЛИВАНИЯ БАЗЫ И ЗАЛИВАЕМ ЕЕ END=========================
-
-/// После прописываем данные от базы в ".env" находится он в "/var/www/betbase.gg/.env"
-/// Теперь выдаем права на папку:
-
-chown -R www-data:www-data /var/www/betbase.gg/storage && chmod -R u=rwX,g=rX,o= /var/www/betbase.gg/storage
-
--------------------------------------------------
-
-/// Установка SSL на NGINX
-
-sudo add-apt-repository ppa:certbot/certbot
-
-sudo apt install python-certbot-nginx
-
-sudo apt install certbot python3-certbot-nginx
-
-sudo ufw allow 'Nginx Full'
-
-sudo ufw delete allow 'Nginx HTTP'
-
-sudo certbot --nginx -d betbase.gg -d www.betbase.gg
-
-/// Select the appropriate number [1-2] then [enter] (press 'c' to cancel): ЖМЕМ 2
-
--------------------------------------------------
-
-cd /var/www/betbase.gg/server
-
-sudo npm install pm2@latest -g
-
-pm2 start app.js
-\
-
-SECURITY: The bundled data.sql no longer seeds an administrator account. The
-upstream dump contained a known bcrypt admin hash. Register the first account,
-then promote it by setting is_admin = 1 on its users row in the database.
+Social login is handled under `/auth/{provider}` and `/auth/callback/{provider}`.
 
 ## Quick start — 1 or 2 commands
 
@@ -261,3 +42,45 @@ then promote it by setting is_admin = 1 on its users row in the database.
 `setup.sh` detects this repository's build system and installs the right toolchain
 dependencies. Use `./setup.sh test` to run the available checks. If a project has no
 standard run target, the script prints the correct command from the sections above.
+
+For this Laravel app, `setup.sh` runs `composer install`. To boot it manually:
+
+```bash
+cp .env.example .env
+php artisan key:generate
+php artisan migrate
+php artisan serve
+```
+
+Configure `DB_*`, `REDIS_*`, and any mail/provider credentials in `.env` first. Never commit real credentials.
+
+## Tests
+
+`composer test` runs the PHPUnit suite under `tests/`. The included tests are a small smoke set (`ExampleTest`) plus `SocialProfileTest`; they do not require external services.
+
+## Project layout
+
+```
+app/                Eloquent models (games, bets, users, payments) and service classes
+app/Http/           controllers, middleware, requests
+config/             Laravel configuration
+database/           migrations, factories, seeds, and data.sql
+public/             front-end assets and entry point
+resources/          Blade views and front-end sources
+routes/             web.php, api.php, channels.php, console.php
+tests/              PHPUnit smoke tests
+```
+
+## Security notes
+
+- `data.sql` no longer seeds an administrator account. The upstream dump contained a known bcrypt admin hash; that seed was removed. Register the first account and promote it explicitly by setting `is_admin = 1` on its `users` row.
+- `.env.example` contains placeholders only. Replace all secrets locally and keep `.env` out of version control.
+- The withdrawal and admin routes are privileged surfaces; review authorization middleware before exposing this app anywhere.
+
+## License
+
+There is no `LICENSE` file in this repository. `composer.json` declares `MIT` (the Laravel framework default), but no project-specific copyright or license notice is present, so confirm terms with the original authors before reuse.
+
+## Historical notes
+
+The original installation instructions (written in Russian, targeting PHP 7.2 and `betbase.gg`) are retained in the git history of `README.md`. They are outdated relative to this snapshot, which requires PHP 8.3 and Laravel 13, and they contain example passwords that must never be reused.
